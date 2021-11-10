@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>AAD Vanilla</title>
+</head>
+
+<body>
+  <button id="login">Azure ADでログイン</button>
+  <button id="logout" style="display: none;">ログアウト</button>
+
+  <script src="https://alcdn.msauth.net/browser/2.19.0/js/msal-browser.min.js"></script>
+  <script type="module">
+    const msalConfig = {
+      auth: {
+        clientId: 'YOUR_CLIENT_ID',
+        authority: 'https://login.microsoftonline.com/YOUR_TENANT_ID',
+        redirectUri: 'http://localhost:3000/blank.html',
+      }
+    };
+
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const login = document.querySelector('#login');
+      const logout = document.querySelector('#logout');
+
+      login.addEventListener('click', async e => {
+        const loginRequest = {
+          scopes: ['user.read'],
+        };
+
+        try {
+          const loginResponse = await msalInstance.loginPopup(loginRequest);
+          console.log(loginResponse)
+          console.log(msalInstance.getAllAccounts());
+          login.style.display = 'none';
+          logout.style.display = null;
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      logout.addEventListener('click', e => {
+        msalInstance.logoutPopup();
+        login.style.display = null;
+        logout.style.display = 'none';
+      });
+    });
+  </script>
+</body>
+
+</html>
